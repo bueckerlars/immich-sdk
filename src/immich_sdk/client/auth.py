@@ -11,7 +11,7 @@ from immich_sdk.models.auth import (
     LogoutResponseDto,
     ValidateAccessTokenResponseDto,
 )
-from immich_sdk.models.user_admin import UserAdminResponseDto
+from immich_sdk.models.user import UserResponseDto
 
 
 class AuthClient:
@@ -49,17 +49,17 @@ class AuthClient:
         resp = self._base.post("/api/auth/logout")
         return LogoutResponseDto.model_validate(resp.json())
 
-    def change_password(self, dto: ChangePasswordDto) -> UserAdminResponseDto:
+    def change_password(self, dto: ChangePasswordDto) -> UserResponseDto:
         """Change the password of the current user.
 
         :param dto: Change password DTO.
-        :returns: Updated user (admin) response.
+        :returns: Updated user response (non-admin, matches /api/auth/ endpoint).
         """
         resp = self._base.post(
             "/api/auth/change-password",
             json=dto.model_dump(by_alias=True, exclude_none=True),
         )
-        return UserAdminResponseDto.model_validate(resp.json())
+        return UserResponseDto.model_validate(resp.json())
 
     def validate_access_token(self) -> ValidateAccessTokenResponseDto:
         """Validate the current authorization method is still valid.
