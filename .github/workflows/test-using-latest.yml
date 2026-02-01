@@ -6,31 +6,31 @@ on:
     branches:
       - main
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
 
 jobs:
-  build:
+  test:
+    name: Test & lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version-file: ".python-version"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: Install dependencies
-        run: |
-          uv sync --all-extras --dev --no-editable --no-cache
+        run: uv sync --locked --all-extras --dev
 
-      - name: Run pre-commits
-        run: |
-          uv run pre-commit run --all-files --verbose
+      - name: Run pre-commit
+        run: uv run pre-commit run --all-files --verbose
 
-      - name: Run Pytest
-        run: |
-          uv run -v pytest
+      - name: Run tests
+        run: uv run pytest
