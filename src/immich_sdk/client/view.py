@@ -30,6 +30,6 @@ class ViewClient:
         :param dto: View settings DTO.
         :returns: Updated view settings.
         """
-        payload = dto.model_dump(by_alias=True, exclude_none=True)
+        payload = dto.model_dump(mode="json", by_alias=True, exclude_none=True)
         resp = self._base.put("/api/view/settings", json=payload)
         return ViewSettingsDto.model_validate(resp.json())

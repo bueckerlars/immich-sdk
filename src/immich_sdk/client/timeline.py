@@ -27,6 +27,6 @@ class TimelineClient:
         """
         resp = self._base.post(
             "/api/timeline/bucket",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return [TimeBucketsResponseDto.model_validate(b) for b in resp.json()]

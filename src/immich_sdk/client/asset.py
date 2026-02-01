@@ -302,7 +302,7 @@ class AssetsClient:
         """
         resp = self._base.put(
             f"/api/assets/{asset_id}/metadata",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return [AssetMetadataResponseDto.model_validate(m) for m in resp.json()]
 
@@ -345,7 +345,7 @@ class AssetsClient:
         """
         resp = self._base.put(
             "/api/assets/metadata",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return [AssetMetadataBulkResponseDto.model_validate(m) for m in resp.json()]
 
@@ -356,5 +356,5 @@ class AssetsClient:
         """
         self._base.delete(
             "/api/assets/metadata",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )

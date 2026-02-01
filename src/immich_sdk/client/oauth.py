@@ -31,7 +31,7 @@ class OAuthClient:
         """
         resp = self._base.post(
             "/api/oauth/authorize",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return OAuthAuthorizeResponseDto.model_validate(resp.json())
 
@@ -42,7 +42,8 @@ class OAuthClient:
         :returns: Response (e.g. login response); structure is server-specific.
         """
         resp = self._base.post(
-            "/api/oauth/callback", json=dto.model_dump(by_alias=True, exclude_none=True)
+            "/api/oauth/callback",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return resp.json()
 
@@ -52,7 +53,8 @@ class OAuthClient:
         :param dto: OAuth callback DTO (url, state, codeVerifier).
         """
         self._base.post(
-            "/api/oauth/link", json=dto.model_dump(by_alias=True, exclude_none=True)
+            "/api/oauth/link",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
 
     def redirect_oauth_to_mobile(
@@ -65,7 +67,7 @@ class OAuthClient:
         """
         resp = self._base.post(
             "/api/oauth/mobile-redirect",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return OAuthMobileRedirectDto.model_validate(resp.json())
 

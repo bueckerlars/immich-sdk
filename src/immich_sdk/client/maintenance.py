@@ -30,7 +30,7 @@ class MaintenanceClient:
         """
         self._base.post(
             "/api/admin/maintenance",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
 
     def detect_prior_install(self) -> MaintenanceDetectInstallResponseDto:
@@ -49,7 +49,7 @@ class MaintenanceClient:
         """
         resp = self._base.post(
             "/api/admin/maintenance/login",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return resp.json()
 

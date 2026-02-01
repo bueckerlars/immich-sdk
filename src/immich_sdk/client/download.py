@@ -38,7 +38,7 @@ class DownloadClient:
             params["slug"] = slug
         resp = self._base.post(
             "/api/download/info",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
             params=params or None,
         )
         return DownloadResponseDto.model_validate(resp.json())

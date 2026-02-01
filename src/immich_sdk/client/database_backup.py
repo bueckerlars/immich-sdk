@@ -34,7 +34,7 @@ class DatabaseBackupClient:
         """
         self._base.delete(
             "/api/admin/database-backups",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
 
     def download_database_backup(self, filename: str) -> bytes:

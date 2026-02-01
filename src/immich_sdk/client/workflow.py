@@ -38,7 +38,7 @@ class WorkflowClient:
         """
         resp = self._base.post(
             "/api/workflows",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return WorkflowResponseDto.model_validate(resp.json())
 
@@ -62,7 +62,7 @@ class WorkflowClient:
         """
         resp = self._base.put(
             f"/api/workflows/{id}",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return WorkflowResponseDto.model_validate(resp.json())
 

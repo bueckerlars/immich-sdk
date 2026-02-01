@@ -36,7 +36,7 @@ class PartnersClient:
         """
         resp = self._base.post(
             "/api/partners",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return PartnerResponseDto.model_validate(resp.json())
 
@@ -56,6 +56,6 @@ class PartnersClient:
         """
         resp = self._base.put(
             f"/api/partners/{id}",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return PartnerResponseDto.model_validate(resp.json())

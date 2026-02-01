@@ -38,7 +38,7 @@ class FacesClient:
 
         :param dto: Face create DTO.
         """
-        self._base.post("/api/faces", json=dto.model_dump(by_alias=True))
+        self._base.post("/api/faces", json=dto.model_dump(mode="json", by_alias=True))
 
     def delete_face(self, id: UUID | str, dto: AssetFaceDeleteDto) -> None:
         """Delete a face identified by the id.
@@ -46,7 +46,9 @@ class FacesClient:
         :param id: Face ID (UUID or string).
         :param dto: Face delete DTO (e.g. force).
         """
-        self._base.delete(f"/api/faces/{id}", json=dto.model_dump(by_alias=True))
+        self._base.delete(
+            f"/api/faces/{id}", json=dto.model_dump(mode="json", by_alias=True)
+        )
 
     def reassign_faces_by_id(self, id: UUID | str, dto: FaceDto) -> PersonResponseDto:
         """Re-assign the face provided in the body to the person identified by the id in the path.
@@ -55,5 +57,7 @@ class FacesClient:
         :param dto: Face DTO (face id to reassign).
         :returns: Updated person.
         """
-        resp = self._base.put(f"/api/faces/{id}", json=dto.model_dump(by_alias=True))
+        resp = self._base.put(
+            f"/api/faces/{id}", json=dto.model_dump(mode="json", by_alias=True)
+        )
         return PersonResponseDto.model_validate(resp.json())

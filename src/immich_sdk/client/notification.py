@@ -52,7 +52,7 @@ class NotificationsClient:
         """
         resp = self._base.patch(
             f"/api/notifications/{id}",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return NotificationDto.model_validate(resp.json())
 
@@ -70,7 +70,7 @@ class NotificationsClient:
         """
         self._base.put(
             "/api/notifications",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
 
     def delete_all_notifications(self) -> None:
@@ -85,7 +85,7 @@ class NotificationsClient:
         """
         resp = self._base.post(
             "/api/admin/notifications",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return NotificationDto.model_validate(resp.json())
 

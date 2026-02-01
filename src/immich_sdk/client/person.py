@@ -99,7 +99,7 @@ class PeopleClient:
         """
         resp = self._base.put(
             f"/api/people/{id}/reassign-faces",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return [PersonResponseDto.model_validate(p) for p in resp.json()]
 

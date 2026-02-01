@@ -38,6 +38,6 @@ class SyncClient:
         """
         resp = self._base.post(
             "/api/sync/checksums",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return SyncChecksumsResponseDto.model_validate(resp.json())

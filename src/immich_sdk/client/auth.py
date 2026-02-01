@@ -57,7 +57,7 @@ class AuthClient:
         """
         resp = self._base.post(
             "/api/auth/change-password",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return UserResponseDto.model_validate(resp.json())
 

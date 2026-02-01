@@ -36,7 +36,7 @@ class SystemConfigClient:
         """
         resp = self._base.put(
             "/api/system-config",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return SystemConfigDto.model_validate(resp.json())
 

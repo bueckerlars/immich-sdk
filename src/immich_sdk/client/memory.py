@@ -73,7 +73,7 @@ class MemoriesClient:
         """
         resp = self._base.post(
             "/api/memories",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return MemoryResponseDto.model_validate(resp.json())
 
@@ -95,7 +95,7 @@ class MemoriesClient:
         """
         resp = self._base.put(
             f"/api/memories/{id}",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return MemoryResponseDto.model_validate(resp.json())
 

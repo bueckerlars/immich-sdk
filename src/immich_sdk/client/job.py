@@ -27,7 +27,8 @@ class JobsClient:
         :param dto: Job create DTO (manual job name).
         """
         self._base.post(
-            "/api/jobs", json=dto.model_dump(by_alias=True, exclude_none=True)
+            "/api/jobs",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
 
     def get_queues_legacy(self) -> QueuesResponseLegacyDto:
@@ -49,6 +50,6 @@ class JobsClient:
         """
         resp = self._base.put(
             f"/api/jobs/{name}",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return QueueResponseLegacyDto.model_validate(resp.json())

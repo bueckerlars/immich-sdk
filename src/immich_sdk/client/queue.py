@@ -66,7 +66,8 @@ class QueueClient:
         :returns: Updated queue DTO.
         """
         resp = self._base.put(
-            f"/api/queue/{name}", json=dto.model_dump(by_alias=True, exclude_none=True)
+            f"/api/queue/{name}",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return QueueResponseDto.model_validate(resp.json())
 

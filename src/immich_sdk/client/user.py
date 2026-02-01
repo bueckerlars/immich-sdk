@@ -75,7 +75,7 @@ class UserClient:
         """
         resp = self._base.put(
             f"/api/user/{id}/preferences",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return UserPreferencesResponseDto.model_validate(resp.json())
 

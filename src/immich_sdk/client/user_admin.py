@@ -55,7 +55,7 @@ class UserAdminClient:
         """
         resp = self._base.post(
             "/api/admin/users",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return UserAdminResponseDto.model_validate(resp.json())
 
@@ -79,7 +79,7 @@ class UserAdminClient:
         """
         resp = self._base.put(
             f"/api/admin/users/{id}",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return UserAdminResponseDto.model_validate(resp.json())
 
@@ -94,7 +94,7 @@ class UserAdminClient:
         """
         resp = self._base.delete(
             f"/api/admin/users/{id}",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return UserAdminResponseDto.model_validate(resp.json())
 
@@ -127,7 +127,7 @@ class UserAdminClient:
         """
         resp = self._base.put(
             f"/api/admin/users/{id}/preferences",
-            json=dto.model_dump(by_alias=True, exclude_none=True),
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
         )
         return UserPreferencesResponseDto.model_validate(resp.json())
 
