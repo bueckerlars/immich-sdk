@@ -35,15 +35,28 @@ class QueueClient:
         # Legacy shape: object with queue names as keys, value has jobCounts + queueStatus
         result: list[QueueResponseDto] = []
         data_dict = cast(dict[str, dict[str, Any]], data)
+        # QueueStatisticsDto requires all six fields; legacy jobCounts may omit some
+        stats_defaults: dict[str, int] = {
+            "active": 0,
+            "completed": 0,
+            "delayed": 0,
+            "failed": 0,
+            "paused": 0,
+            "waiting": 0,
+        }
         for name, v in data_dict.items():
             st: dict[str, Any] = v.get("queueStatus") or {}
             jc: dict[str, Any] = v.get("jobCounts") or {}
+            statistics = {
+                **stats_defaults,
+                **{k: v for k, v in jc.items() if k in stats_defaults},
+            }
             result.append(
                 QueueResponseDto.model_validate(
                     {
                         "name": name,
                         "isPaused": st.get("isPaused", False),
-                        "statistics": jc,
+                        "statistics": statistics,
                     }
                 )
             )
