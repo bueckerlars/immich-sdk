@@ -3,6 +3,14 @@
 from pydantic import BaseModel, Field
 
 
+class ChangePasswordDto(BaseModel):
+    """DTO for changing password."""
+
+    password: str = Field(..., description="Current password")
+    newPassword: str = Field(..., min_length=8, description="New password")
+    invalidateSessions: bool = Field(False, description="Invalidate all other sessions")
+
+
 class LoginCredentialDto(BaseModel):
     """DTO for login credentials."""
 
@@ -31,3 +39,16 @@ class AuthStatusResponseDto(BaseModel):
     pinCode: bool = Field(..., description="Has PIN code set")
     expiresAt: str | None = Field(None, description="Session expiration date")
     pinExpiresAt: str | None = Field(None, description="PIN expiration date")
+
+
+class LogoutResponseDto(BaseModel):
+    """DTO for logout response."""
+
+    successful: bool = Field(..., description="Logout successful")
+    redirectUri: str = Field(..., description="Redirect URI")
+
+
+class ValidateAccessTokenResponseDto(BaseModel):
+    """DTO for validate access token response."""
+
+    authStatus: bool = Field(..., description="Authentication status")

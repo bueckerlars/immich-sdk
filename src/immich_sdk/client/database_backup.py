@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.database_backup import (
+    DatabaseBackupDeleteDto,
+    DatabaseBackupListResponseDto,
+)
 
 
 class DatabaseBackupClient:
@@ -15,20 +19,23 @@ class DatabaseBackupClient:
         """
         self._base = base
 
-    def list_database_backups(self) -> dict[str, object]:
+    def list_database_backups(self) -> DatabaseBackupListResponseDto:
         """Get the list of the successful and failed backups.
 
-        :returns: Raw response dict from the API.
+        :returns: Database backup list response.
         """
         resp = self._base.get("/api/admin/database-backups")
-        return resp.json()
+        return DatabaseBackupListResponseDto.model_validate(resp.json())
 
-    def delete_database_backup(self, dto: dict[str, object]) -> None:
-        """Delete a backup by its filename.
+    def delete_database_backup(self, dto: DatabaseBackupDeleteDto) -> None:
+        """Delete a backup by its filename(s).
 
-        :param dto: Dict with backup filename to delete.
+        :param dto: DTO with backup filenames to delete.
         """
-        self._base.delete("/api/admin/database-backups", json=dto)
+        self._base.delete(
+            "/api/admin/database-backups",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
 
     def download_database_backup(self, filename: str) -> bytes:
         """Download the database backup file.

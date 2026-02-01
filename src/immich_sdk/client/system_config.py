@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.system_config import (
+    StorageTemplateOptionsDto,
+    SystemConfigDto,
+    SystemConfigUpdateDto,
+)
 
 
 class SystemConfigClient:
@@ -15,27 +20,30 @@ class SystemConfigClient:
         """
         self._base = base
 
-    def get_system_config(self) -> dict[str, object]:
+    def get_system_config(self) -> SystemConfigDto:
         """Get system config.
 
-        :returns: Raw response dict from the API.
+        :returns: System config DTO.
         """
         resp = self._base.get("/api/system-config")
-        return resp.json()
+        return SystemConfigDto.model_validate(resp.json())
 
-    def update_system_config(self, dto: dict[str, object]) -> dict[str, object]:
+    def update_system_config(self, dto: SystemConfigUpdateDto) -> SystemConfigDto:
         """Update system config.
 
-        :param dto: Dict with config fields to update.
-        :returns: Raw response dict from the API.
+        :param dto: Config fields to update.
+        :returns: Updated system config DTO.
         """
-        resp = self._base.put("/api/system-config", json=dto)
-        return resp.json()
+        resp = self._base.put(
+            "/api/system-config",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
+        return SystemConfigDto.model_validate(resp.json())
 
-    def get_storage_template_options(self) -> dict[str, object]:
+    def get_storage_template_options(self) -> StorageTemplateOptionsDto:
         """Get storage template options.
 
-        :returns: Raw response dict from the API.
+        :returns: Storage template options DTO.
         """
         resp = self._base.get("/api/system-config/storage-template-options")
-        return resp.json()
+        return StorageTemplateOptionsDto.model_validate(resp.json())

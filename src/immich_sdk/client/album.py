@@ -9,6 +9,7 @@ from immich_sdk.models import (
     AlbumResponseDto,
     AlbumStatisticsResponseDto,
     AlbumsAddAssetsDto,
+    AlbumsAddAssetsResponseDto,
     BulkIdResponseDto,
     BulkIdsDto,
     CreateAlbumDto,
@@ -119,17 +120,19 @@ class AlbumsClient:
         resp = self._base.get("/api/albums/statistics")
         return AlbumStatisticsResponseDto.model_validate(resp.json())
 
-    def add_assets_to_albums(self, dto: AlbumsAddAssetsDto) -> dict[str, object]:
+    def add_assets_to_albums(
+        self, dto: AlbumsAddAssetsDto
+    ) -> AlbumsAddAssetsResponseDto:
         """Send a list of asset IDs and album IDs to add each asset to each album.
 
         :param dto: :class:`AlbumsAddAssetsDto` with album and asset IDs.
-        :returns: Raw response dict from the API.
+        :returns: :class:`AlbumsAddAssetsResponseDto`.
         """
         resp = self._base.put(
             "/api/albums/assets",
             json=dto.model_dump(mode="json", exclude_none=True),
         )
-        return resp.json()
+        return AlbumsAddAssetsResponseDto.model_validate(resp.json())
 
     def add_assets_to_album(
         self,

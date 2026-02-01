@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.view import ViewSettingsDto
 
 
 class ViewClient:
@@ -15,19 +16,20 @@ class ViewClient:
         """
         self._base = base
 
-    def get_view_settings(self) -> dict[str, object]:
+    def get_view_settings(self) -> ViewSettingsDto:
         """Get view settings.
 
-        :returns: Raw response dict from the API.
+        :returns: View settings DTO.
         """
         resp = self._base.get("/api/view/settings")
-        return resp.json()
+        return ViewSettingsDto.model_validate(resp.json())
 
-    def update_view_settings(self, dto: dict[str, object]) -> dict[str, object]:
+    def update_view_settings(self, dto: ViewSettingsDto) -> ViewSettingsDto:
         """Update view settings.
 
-        :param dto: Dict with view settings.
-        :returns: Raw response dict from the API.
+        :param dto: View settings DTO.
+        :returns: Updated view settings.
         """
-        resp = self._base.put("/api/view/settings", json=dto)
-        return resp.json()
+        payload = dto.model_dump(mode="json", by_alias=True, exclude_none=True)
+        resp = self._base.put("/api/view/settings", json=payload)
+        return ViewSettingsDto.model_validate(resp.json())

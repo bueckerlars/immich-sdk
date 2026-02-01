@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.search import TimeBucketsResponseDto
+from immich_sdk.models.timeline import TimelineBucketRequestDto
 
 
 class TimelineClient:
@@ -15,11 +17,16 @@ class TimelineClient:
         """
         self._base = base
 
-    def get_time_buckets(self, dto: dict[str, object]) -> list[dict[str, object]]:
+    def get_time_buckets(
+        self, dto: TimelineBucketRequestDto
+    ) -> list[TimeBucketsResponseDto]:
         """Get time buckets for timeline.
 
-        :param dto: Dict with time bucket options.
-        :returns: List of time bucket dicts.
+        :param dto: Time bucket request options.
+        :returns: List of time bucket DTOs.
         """
-        resp = self._base.post("/api/timeline/bucket", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/timeline/bucket",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
+        return [TimeBucketsResponseDto.model_validate(b) for b in resp.json()]

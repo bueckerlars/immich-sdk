@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from immich_sdk.models import BulkIdsDto
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models import AssetResponseDto, BulkIdsDto
 
 
 class TrashClient:
@@ -16,13 +16,14 @@ class TrashClient:
         """
         self._base = base
 
-    def get_trash(self) -> list[dict[str, object]]:
+    def get_trash(self) -> list[AssetResponseDto]:
         """Retrieve trashed assets.
 
-        :returns: List of trashed asset dicts.
+        :returns: List of :class:`AssetResponseDto`.
         """
         resp = self._base.get("/api/trash")
-        return resp.json()
+        data = resp.json()
+        return [AssetResponseDto.model_validate(item) for item in data]
 
     def restore_assets(self, dto: BulkIdsDto) -> None:
         """Restore assets from trash.

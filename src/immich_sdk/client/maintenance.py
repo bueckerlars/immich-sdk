@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.maintenance import (
+    MaintenanceDetectInstallResponseDto,
+    MaintenanceLoginDto,
+    MaintenanceStatusResponseDto,
+    SetMaintenanceModeDto,
+)
 
 
 class MaintenanceClient:
@@ -15,34 +23,40 @@ class MaintenanceClient:
         """
         self._base = base
 
-    def set_maintenance_mode(self, dto: dict[str, object]) -> None:
+    def set_maintenance_mode(self, dto: SetMaintenanceModeDto) -> None:
         """Put Immich into or take it out of maintenance mode.
 
-        :param dto: Dict with maintenance mode flag.
+        :param dto: Set maintenance mode DTO.
         """
-        self._base.post("/api/admin/maintenance", json=dto)
+        self._base.post(
+            "/api/admin/maintenance",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
 
-    def detect_prior_install(self) -> dict[str, object]:
+    def detect_prior_install(self) -> MaintenanceDetectInstallResponseDto:
         """Collect integrity checks and other heuristics about local data.
 
-        :returns: Raw response dict from the API.
+        :returns: Detect install response.
         """
         resp = self._base.get("/api/admin/maintenance/detect-install")
-        return resp.json()
+        return MaintenanceDetectInstallResponseDto.model_validate(resp.json())
 
-    def maintenance_login(self, dto: dict[str, object]) -> dict[str, object]:
+    def maintenance_login(self, dto: MaintenanceLoginDto) -> dict[str, Any]:
         """Login with maintenance token or cookie.
 
-        :param dto: Dict with token or cookie.
-        :returns: Raw response dict from the API.
+        :param dto: Maintenance login DTO (token).
+        :returns: Login response (e.g. session); structure is server-specific.
         """
-        resp = self._base.post("/api/admin/maintenance/login", json=dto)
+        resp = self._base.post(
+            "/api/admin/maintenance/login",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
         return resp.json()
 
-    def get_maintenance_status(self) -> dict[str, object]:
+    def get_maintenance_status(self) -> MaintenanceStatusResponseDto:
         """Fetch information about the currently running maintenance action.
 
-        :returns: Raw response dict from the API.
+        :returns: Maintenance status response.
         """
         resp = self._base.get("/api/admin/maintenance/status")
-        return resp.json()
+        return MaintenanceStatusResponseDto.model_validate(resp.json())

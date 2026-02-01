@@ -5,6 +5,16 @@ from __future__ import annotations
 from uuid import UUID
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.user_admin import (
+    SessionResponseDto,
+    UserAdminCreateDto,
+    UserAdminDeleteDto,
+    UserAdminResponseDto,
+    UserAdminUpdateDto,
+    UserPreferencesResponseDto,
+    UserPreferencesUpdateDto,
+    UserStatisticsResponseDto,
+)
 
 
 class UserAdminClient:
@@ -22,12 +32,12 @@ class UserAdminClient:
         *,
         id: UUID | str | None = None,
         with_deleted: bool | None = None,
-    ) -> list[dict[str, object]]:
+    ) -> list[UserAdminResponseDto]:
         """Search for users (admin).
 
         :param id: Optional user ID filter.
         :param with_deleted: If True, include deleted users.
-        :returns: List of user dicts.
+        :returns: List of user admin DTOs.
         """
         params: dict[str, str | bool] = {}
         if id is not None:
@@ -35,88 +45,100 @@ class UserAdminClient:
         if with_deleted is not None:
             params["withDeleted"] = with_deleted
         resp = self._base.get("/api/admin/users", params=params or None)
-        return resp.json()
+        return [UserAdminResponseDto.model_validate(u) for u in resp.json()]
 
-    def create_user_admin(self, dto: dict[str, object]) -> dict[str, object]:
+    def create_user_admin(self, dto: UserAdminCreateDto) -> UserAdminResponseDto:
         """Create a new user (admin).
 
-        :param dto: Dict with user data.
-        :returns: Raw response dict from the API.
+        :param dto: User create DTO.
+        :returns: Created user admin DTO.
         """
-        resp = self._base.post("/api/admin/users", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/admin/users",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
+        return UserAdminResponseDto.model_validate(resp.json())
 
-    def get_user_admin(self, id: UUID | str) -> dict[str, object]:
+    def get_user_admin(self, id: UUID | str) -> UserAdminResponseDto:
         """Retrieve a specific user by their ID (admin).
 
         :param id: User ID (UUID or string).
-        :returns: Raw response dict from the API.
+        :returns: User admin DTO.
         """
         resp = self._base.get(f"/api/admin/users/{id}")
-        return resp.json()
+        return UserAdminResponseDto.model_validate(resp.json())
 
     def update_user_admin(
-        self, id: UUID | str, dto: dict[str, object]
-    ) -> dict[str, object]:
+        self, id: UUID | str, dto: UserAdminUpdateDto
+    ) -> UserAdminResponseDto:
         """Update an existing user (admin).
 
         :param id: User ID (UUID or string).
-        :param dto: Dict with fields to update.
-        :returns: Raw response dict from the API.
+        :param dto: User update DTO.
+        :returns: Updated user admin DTO.
         """
-        resp = self._base.put(f"/api/admin/users/{id}", json=dto)
-        return resp.json()
+        resp = self._base.put(
+            f"/api/admin/users/{id}",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
+        return UserAdminResponseDto.model_validate(resp.json())
 
     def delete_user_admin(
-        self, id: UUID | str, dto: dict[str, object]
-    ) -> dict[str, object]:
+        self, id: UUID | str, dto: UserAdminDeleteDto
+    ) -> UserAdminResponseDto:
         """Delete a user (admin).
 
         :param id: User ID (UUID or string).
-        :param dto: Dict with delete options.
-        :returns: Raw response dict from the API.
+        :param dto: User delete DTO (e.g. force).
+        :returns: Deleted user admin DTO.
         """
-        resp = self._base.delete(f"/api/admin/users/{id}", json=dto)
-        return resp.json()
+        resp = self._base.delete(
+            f"/api/admin/users/{id}",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
+        return UserAdminResponseDto.model_validate(resp.json())
 
-    def restore_user_admin(self, id: UUID | str) -> dict[str, object]:
+    def restore_user_admin(self, id: UUID | str) -> UserAdminResponseDto:
         """Restore a previously deleted user (admin).
 
         :param id: User ID (UUID or string).
-        :returns: Raw response dict from the API.
+        :returns: Restored user admin DTO.
         """
         resp = self._base.post(f"/api/admin/users/{id}/restore")
-        return resp.json()
+        return UserAdminResponseDto.model_validate(resp.json())
 
-    def get_user_preferences_admin(self, id: UUID | str) -> dict[str, object]:
+    def get_user_preferences_admin(self, id: UUID | str) -> UserPreferencesResponseDto:
         """Retrieve the preferences of a specific user (admin).
 
         :param id: User ID (UUID or string).
-        :returns: Raw response dict from the API.
+        :returns: User preferences DTO.
         """
         resp = self._base.get(f"/api/admin/users/{id}/preferences")
-        return resp.json()
+        return UserPreferencesResponseDto.model_validate(resp.json())
 
     def update_user_preferences_admin(
-        self, id: UUID | str, dto: dict[str, object]
-    ) -> dict[str, object]:
+        self, id: UUID | str, dto: UserPreferencesUpdateDto
+    ) -> UserPreferencesResponseDto:
         """Update the preferences of a specific user (admin).
 
         :param id: User ID (UUID or string).
-        :param dto: Dict with preference fields.
-        :returns: Raw response dict from the API.
+        :param dto: User preferences update DTO.
+        :returns: Updated user preferences DTO.
         """
-        resp = self._base.put(f"/api/admin/users/{id}/preferences", json=dto)
-        return resp.json()
+        resp = self._base.put(
+            f"/api/admin/users/{id}/preferences",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
+        return UserPreferencesResponseDto.model_validate(resp.json())
 
-    def get_user_sessions_admin(self, id: UUID | str) -> list[dict[str, object]]:
+    def get_user_sessions_admin(self, id: UUID | str) -> list[SessionResponseDto]:
         """Retrieve all sessions for a specific user (admin).
 
         :param id: User ID (UUID or string).
-        :returns: List of session dicts.
+        :returns: List of session DTOs.
         """
         resp = self._base.get(f"/api/admin/users/{id}/sessions")
-        return resp.json()
+        return [SessionResponseDto.model_validate(s) for s in resp.json()]
 
     def get_user_statistics_admin(
         self,
@@ -125,14 +147,14 @@ class UserAdminClient:
         is_favorite: bool | None = None,
         is_trashed: bool | None = None,
         visibility: str | None = None,
-    ) -> dict[str, object]:
+    ) -> UserStatisticsResponseDto:
         """Retrieve asset statistics for a specific user (admin).
 
         :param id: User ID (UUID or string).
         :param is_favorite: Optional filter for favorite assets.
         :param is_trashed: Optional filter for trashed assets.
         :param visibility: Optional visibility filter.
-        :returns: Raw response dict from the API.
+        :returns: User statistics DTO.
         """
         params: dict[str, str | bool] = {}
         if is_favorite is not None:
@@ -144,4 +166,4 @@ class UserAdminClient:
         resp = self._base.get(
             f"/api/admin/users/{id}/statistics", params=params or None
         )
-        return resp.json()
+        return UserStatisticsResponseDto.model_validate(resp.json())

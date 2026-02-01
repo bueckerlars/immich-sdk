@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.sync import (
+    SyncChecksumsRequestDto,
+    SyncChecksumsResponseDto,
+    SyncStatusResponseDto,
+)
 
 
 class SyncClient:
@@ -15,19 +20,24 @@ class SyncClient:
         """
         self._base = base
 
-    def get_sync_status(self) -> dict[str, object]:
+    def get_sync_status(self) -> SyncStatusResponseDto:
         """Get sync status.
 
-        :returns: Raw response dict from the API.
+        :returns: Sync status response.
         """
         resp = self._base.get("/api/sync/status")
-        return resp.json()
+        return SyncStatusResponseDto.model_validate(resp.json())
 
-    def get_upload_checksums(self, dto: dict[str, object]) -> dict[str, object]:
+    def get_upload_checksums(
+        self, dto: SyncChecksumsRequestDto
+    ) -> SyncChecksumsResponseDto:
         """Get upload checksums for duplicate detection.
 
-        :param dto: Dict with asset IDs or checksums.
-        :returns: Raw response dict from the API.
+        :param dto: Request DTO (e.g. asset IDs or checksums).
+        :returns: Checksums response.
         """
-        resp = self._base.post("/api/sync/checksums", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/sync/checksums",
+            json=dto.model_dump(mode="json", by_alias=True, exclude_none=True),
+        )
+        return SyncChecksumsResponseDto.model_validate(resp.json())
