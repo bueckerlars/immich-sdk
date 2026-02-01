@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.oauth import (
+    OAuthAuthorizeResponseDto,
+    OAuthCallbackDto,
+    OAuthConfigDto,
+    OAuthMobileRedirectDto,
+)
 
 
 class OAuthClient:
@@ -15,39 +23,51 @@ class OAuthClient:
         """
         self._base = base
 
-    def start_oauth(self, dto: dict[str, object]) -> dict[str, object]:
+    def start_oauth(self, dto: OAuthConfigDto) -> OAuthAuthorizeResponseDto:
         """Start OAuth flow.
 
-        :param dto: Dict with OAuth provider and redirect info.
-        :returns: Raw response dict from the API.
+        :param dto: OAuth config (redirect URI, state, code challenge).
+        :returns: Authorize response with URL to redirect user.
         """
-        resp = self._base.post("/api/oauth/authorize", json=dto)
+        resp = self._base.post(
+            "/api/oauth/authorize",
+            json=dto.model_dump(by_alias=True, exclude_none=True),
+        )
+        return OAuthAuthorizeResponseDto.model_validate(resp.json())
+
+    def finish_oauth(self, dto: OAuthCallbackDto) -> dict[str, Any]:
+        """Finish OAuth flow (callback). Returns token/session; type varies by server.
+
+        :param dto: OAuth callback DTO (url, state, codeVerifier).
+        :returns: Response (e.g. login response); structure is server-specific.
+        """
+        resp = self._base.post(
+            "/api/oauth/callback", json=dto.model_dump(by_alias=True, exclude_none=True)
+        )
         return resp.json()
 
-    def finish_oauth(self, dto: dict[str, object]) -> dict[str, object]:
-        """Finish OAuth flow.
-
-        :param dto: Dict with OAuth callback data.
-        :returns: Raw response dict from the API.
-        """
-        resp = self._base.post("/api/oauth/callback", json=dto)
-        return resp.json()
-
-    def link_oauth_account(self, dto: dict[str, object]) -> None:
+    def link_oauth_account(self, dto: OAuthCallbackDto) -> None:
         """Link OAuth account.
 
-        :param dto: Dict with OAuth link data.
+        :param dto: OAuth callback DTO (url, state, codeVerifier).
         """
-        self._base.post("/api/oauth/link", json=dto)
+        self._base.post(
+            "/api/oauth/link", json=dto.model_dump(by_alias=True, exclude_none=True)
+        )
 
-    def redirect_oauth_to_mobile(self, dto: dict[str, object]) -> dict[str, object]:
+    def redirect_oauth_to_mobile(
+        self, dto: OAuthMobileRedirectDto
+    ) -> OAuthMobileRedirectDto:
         """Redirect OAuth to mobile.
 
-        :param dto: Dict with redirect data.
-        :returns: Raw response dict from the API.
+        :param dto: Redirect DTO (url).
+        :returns: Redirect response.
         """
-        resp = self._base.post("/api/oauth/mobile-redirect", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/oauth/mobile-redirect",
+            json=dto.model_dump(by_alias=True, exclude_none=True),
+        )
+        return OAuthMobileRedirectDto.model_validate(resp.json())
 
     def unlink_oauth_account(self) -> None:
         """Unlink OAuth account."""

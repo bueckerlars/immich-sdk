@@ -23,11 +23,22 @@ def test_get_all_albums_returns_parsed_list() -> None:
             "createdAt": "2024-01-01T00:00:00.000Z",
             "updatedAt": "2024-01-01T00:00:00.000Z",
             "ownerId": "user-1",
-            "owner": {"id": "user-1", "email": "u@x.com", "name": "User"},
+            "owner": {
+                "id": "user-1",
+                "email": "u@x.com",
+                "name": "User",
+                "avatarColor": "primary",
+                "profileImagePath": "/path",
+                "profileChangedAt": "2024-01-01T00:00:00.000Z",
+            },
             "shared": False,
             "hasSharedLink": False,
             "isActivityEnabled": False,
             "contributorCounts": [],
+            "order": None,
+            "startDate": None,
+            "endDate": None,
+            "lastModifiedAssetTimestamp": None,
         },
     ]
 

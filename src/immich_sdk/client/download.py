@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from immich_sdk.models import AssetIdsDto
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models import AssetIdsDto
+from immich_sdk.models.download import DownloadInfoDto, DownloadResponseDto
 
 
 class DownloadClient:
@@ -18,17 +19,17 @@ class DownloadClient:
 
     def get_download_info(
         self,
-        dto: dict[str, object],
+        dto: DownloadInfoDto,
         *,
         key: str | None = None,
         slug: str | None = None,
-    ) -> dict[str, object]:
+    ) -> DownloadResponseDto:
         """Retrieve information about how to request a download for the specified assets or album.
 
-        :param dto: Dict with asset IDs or album ID.
+        :param dto: Download info DTO (asset IDs, album ID, etc.).
         :param key: Optional shared link key.
         :param slug: Optional shared link slug.
-        :returns: Raw response dict from the API.
+        :returns: Download response DTO.
         """
         params: dict[str, str] = {}
         if key is not None:
@@ -37,10 +38,10 @@ class DownloadClient:
             params["slug"] = slug
         resp = self._base.post(
             "/api/download/info",
-            json=dto,
+            json=dto.model_dump(by_alias=True, exclude_none=True),
             params=params or None,
         )
-        return resp.json()
+        return DownloadResponseDto.model_validate(resp.json())
 
     def download_archive(
         self,

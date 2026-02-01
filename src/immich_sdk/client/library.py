@@ -5,6 +5,14 @@ from __future__ import annotations
 from uuid import UUID
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models import (
+    CreateLibraryDto,
+    LibraryResponseDto,
+    LibraryStatsResponseDto,
+    UpdateLibraryDto,
+    ValidateLibraryDto,
+    ValidateLibraryResponseDto,
+)
 
 
 class LibrariesClient:
@@ -17,43 +25,50 @@ class LibrariesClient:
         """
         self._base = base
 
-    def get_all_libraries(self) -> list[dict[str, object]]:
+    def get_all_libraries(self) -> list[LibraryResponseDto]:
         """Retrieve a list of external libraries.
 
-        :returns: List of library dicts.
+        :returns: List of :class:`LibraryResponseDto`.
         """
         resp = self._base.get("/api/libraries")
-        return resp.json()
+        data = resp.json()
+        return [LibraryResponseDto.model_validate(item) for item in data]
 
-    def create_library(self, dto: dict[str, object]) -> dict[str, object]:
+    def create_library(self, dto: CreateLibraryDto) -> LibraryResponseDto:
         """Create a new external library.
 
-        :param dto: Dict with library settings.
-        :returns: Raw response dict from the API.
+        :param dto: :class:`CreateLibraryDto` with library settings.
+        :returns: :class:`LibraryResponseDto`.
         """
-        resp = self._base.post("/api/libraries", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/libraries",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        return LibraryResponseDto.model_validate(resp.json())
 
-    def get_library(self, id: UUID | str) -> dict[str, object]:
+    def get_library(self, id: UUID | str) -> LibraryResponseDto:
         """Retrieve an external library by its ID.
 
         :param id: Library ID (UUID or string).
-        :returns: Raw response dict from the API.
+        :returns: :class:`LibraryResponseDto`.
         """
         resp = self._base.get(f"/api/libraries/{id}")
-        return resp.json()
+        return LibraryResponseDto.model_validate(resp.json())
 
     def update_library(
-        self, id: UUID | str, dto: dict[str, object]
-    ) -> dict[str, object]:
+        self, id: UUID | str, dto: UpdateLibraryDto
+    ) -> LibraryResponseDto:
         """Update an existing external library.
 
         :param id: Library ID (UUID or string).
-        :param dto: Dict with fields to update.
-        :returns: Raw response dict from the API.
+        :param dto: :class:`UpdateLibraryDto` with fields to update.
+        :returns: :class:`LibraryResponseDto`.
         """
-        resp = self._base.put(f"/api/libraries/{id}", json=dto)
-        return resp.json()
+        resp = self._base.put(
+            f"/api/libraries/{id}",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        return LibraryResponseDto.model_validate(resp.json())
 
     def delete_library(self, id: UUID | str) -> None:
         """Delete an external library by its ID.
@@ -69,23 +84,26 @@ class LibrariesClient:
         """
         self._base.post(f"/api/libraries/{id}/scan")
 
-    def get_library_statistics(self, id: UUID | str) -> dict[str, object]:
+    def get_library_statistics(self, id: UUID | str) -> LibraryStatsResponseDto:
         """Retrieve statistics for a specific external library.
 
         :param id: Library ID (UUID or string).
-        :returns: Raw response dict from the API.
+        :returns: :class:`LibraryStatsResponseDto`.
         """
         resp = self._base.get(f"/api/libraries/{id}/statistics")
-        return resp.json()
+        return LibraryStatsResponseDto.model_validate(resp.json())
 
     def validate_library(
-        self, id: UUID | str, dto: dict[str, object]
-    ) -> dict[str, object]:
+        self, id: UUID | str, dto: ValidateLibraryDto
+    ) -> ValidateLibraryResponseDto:
         """Validate the settings of an external library.
 
         :param id: Library ID (UUID or string).
-        :param dto: Dict with library settings to validate.
-        :returns: Raw response dict from the API.
+        :param dto: :class:`ValidateLibraryDto` with library settings to validate.
+        :returns: :class:`ValidateLibraryResponseDto`.
         """
-        resp = self._base.post(f"/api/libraries/{id}/validate", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            f"/api/libraries/{id}/validate",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        return ValidateLibraryResponseDto.model_validate(resp.json())

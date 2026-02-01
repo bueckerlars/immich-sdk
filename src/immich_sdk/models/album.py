@@ -1,10 +1,29 @@
 """Album-related DTOs."""
 
+from __future__ import annotations
+
+from typing import TypeAlias
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from immich_sdk.models.common import AlbumUserRole, AssetOrder
+from immich_sdk.models.asset import AssetResponseDto
+from immich_sdk.models.common import AlbumUserRole, AssetOrder, BulkIdErrorReason
+from immich_sdk.models.user import UserResponseDto
+
+
+class AlbumUserResponseDto(BaseModel):
+    """Album user in response (role + user)."""
+
+    role: AlbumUserRole = Field(..., description="Album user role")
+    user: UserResponseDto = Field(..., description="User")
+
+
+class ContributorCountResponseDto(BaseModel):
+    """Contributor count in album."""
+
+    assetCount: int = Field(..., description="Number of assets contributed")
+    userId: str = Field(..., description="User ID")
 
 
 class AlbumUserCreateDto(BaseModel):
@@ -42,6 +61,13 @@ class AlbumsAddAssetsDto(BaseModel):
     assetIds: list[UUID] = Field(..., description="Asset IDs")
 
 
+class AlbumsAddAssetsResponseDto(BaseModel):
+    """Response for adding assets to multiple albums."""
+
+    success: bool = Field(..., description="Operation success")
+    error: BulkIdErrorReason | None = Field(None, description="Error reason if failed")
+
+
 class AlbumStatisticsResponseDto(BaseModel):
     """Album statistics response DTO."""
 
@@ -71,6 +97,11 @@ class UpdateAlbumDto(BaseModel):
     order: AssetOrder | None = Field(None, description="Asset sort order")
 
 
+_AlbumUserList: TypeAlias = list[AlbumUserResponseDto]
+_AssetList: TypeAlias = list[AssetResponseDto]
+_ContributorCountList: TypeAlias = list[ContributorCountResponseDto]
+
+
 class AlbumResponseDto(BaseModel):
     """Album response DTO."""
 
@@ -78,17 +109,17 @@ class AlbumResponseDto(BaseModel):
     albumName: str = Field(..., description="Album name")
     description: str = Field(..., description="Album description")
     albumThumbnailAssetId: str | None = Field(None, description="Thumbnail asset ID")
-    albumUsers: list[dict[str, object]] = Field(
-        default_factory=lambda: [], description="Album users"
+    albumUsers: _AlbumUserList = Field(  # pyright: ignore[reportUnknownVariableType]
+        default_factory=list, description="Album users"
     )
     assetCount: int = Field(..., description="Number of assets")
-    assets: list[dict[str, object]] = Field(
-        default_factory=lambda: [], description="Assets"
+    assets: _AssetList = Field(  # pyright: ignore[reportUnknownVariableType]
+        default_factory=list, description="Assets"
     )
     createdAt: str = Field(..., description="Creation date")
     updatedAt: str = Field(..., description="Last update date")
     ownerId: str = Field(..., description="Owner user ID")
-    owner: dict[str, object] | None = Field(None, description="Owner")
+    owner: UserResponseDto | None = Field(None, description="Owner")
     shared: bool = Field(..., description="Is shared album")
     hasSharedLink: bool = Field(..., description="Has shared link")
     isActivityEnabled: bool = Field(..., description="Activity feed enabled")
@@ -98,6 +129,8 @@ class AlbumResponseDto(BaseModel):
         None, description="Last modified asset timestamp"
     )
     order: str | None = Field(None, description="Asset sort order")
-    contributorCounts: list[dict[str, object]] = Field(
-        default_factory=lambda: [], description="Contributor counts"
+    contributorCounts: _ContributorCountList = (
+        Field(  # pyright: ignore[reportUnknownVariableType]
+            default_factory=list, description="Contributor counts"
+        )
     )

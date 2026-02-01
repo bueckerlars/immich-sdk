@@ -3,6 +3,15 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models import (
+    MetadataSearchDto,
+    PlacesResponseDto,
+    SearchExploreResponseDto,
+    SearchResponseDto,
+    SmartSearchDto,
+    TimeBucketsResponseDto,
+)
+from immich_sdk.models.person import PersonResponseDto
 
 
 class SearchClient:
@@ -15,64 +24,84 @@ class SearchClient:
         """
         self._base = base
 
-    def search_assets(self, dto: dict[str, object]) -> dict[str, object]:
+    def search_assets(self, dto: MetadataSearchDto) -> SearchResponseDto:
         """Search assets with filters.
 
-        :param dto: Dict with search filters.
-        :returns: Raw response dict from the API.
+        :param dto: :class:`MetadataSearchDto` with search filters.
+        :returns: :class:`SearchResponseDto` (albums + assets).
         """
-        resp = self._base.post("/api/search/assets", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/search/assets",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        return SearchResponseDto.model_validate(resp.json())
 
-    def search_places(self, dto: dict[str, object]) -> list[dict[str, object]]:
+    def search_places(self, dto: MetadataSearchDto) -> list[PlacesResponseDto]:
         """Search places (cities, etc.).
 
-        :param dto: Dict with search filters.
-        :returns: List of place dicts.
+        :param dto: :class:`MetadataSearchDto` with search filters.
+        :returns: List of place DTOs.
         """
-        resp = self._base.post("/api/search/places", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/search/places",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        return [PlacesResponseDto.model_validate(p) for p in resp.json()]
 
-    def search_people(self, dto: dict[str, object]) -> list[dict[str, object]]:
+    def search_people(self, dto: MetadataSearchDto) -> list[PersonResponseDto]:
         """Search people.
 
-        :param dto: Dict with search filters.
-        :returns: List of person dicts.
+        :param dto: :class:`MetadataSearchDto` with search filters.
+        :returns: List of person DTOs.
         """
-        resp = self._base.post("/api/search/people", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/search/people",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        return [PersonResponseDto.model_validate(p) for p in resp.json()]
 
-    def search_smart(self, dto: dict[str, object]) -> list[dict[str, object]]:
-        """Smart search.
+    def search_smart(self, dto: SmartSearchDto) -> SearchResponseDto:
+        """Smart search (ML-based asset search).
 
-        :param dto: Dict with search query.
-        :returns: List of result dicts.
+        :param dto: :class:`SmartSearchDto` with query and filters.
+        :returns: :class:`SearchResponseDto` (albums + assets).
         """
-        resp = self._base.post("/api/search/smart", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/search/smart",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        return SearchResponseDto.model_validate(resp.json())
 
-    def search_metadata(self, dto: dict[str, object]) -> list[dict[str, object]]:
-        """Search metadata.
+    def search_metadata(self, dto: MetadataSearchDto) -> SearchResponseDto:
+        """Search assets by metadata (same as search_assets).
 
-        :param dto: Dict with search filters.
-        :returns: List of metadata dicts.
+        :param dto: :class:`MetadataSearchDto` with search filters.
+        :returns: :class:`SearchResponseDto` (albums + assets).
         """
-        resp = self._base.post("/api/search/metadata", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/search/metadata",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        return SearchResponseDto.model_validate(resp.json())
 
-    def get_explore_data(self) -> list[dict[str, object]]:
+    def get_explore_data(self) -> list[SearchExploreResponseDto]:
         """Get explore data.
 
-        :returns: List of explore dicts.
+        :returns: List of :class:`SearchExploreResponseDto`.
         """
         resp = self._base.get("/api/search/explore")
-        return resp.json()
+        data = resp.json()
+        return [SearchExploreResponseDto.model_validate(item) for item in data]
 
-    def get_time_buckets(self, dto: dict[str, object]) -> list[dict[str, object]]:
+    def get_time_buckets(self, dto: MetadataSearchDto) -> list[TimeBucketsResponseDto]:
         """Get time buckets for timeline.
 
-        :param dto: Dict with time bucket options.
-        :returns: List of time bucket dicts.
+        :param dto: :class:`MetadataSearchDto` with time bucket options.
+        :returns: List of :class:`TimeBucketsResponseDto`.
         """
-        resp = self._base.post("/api/search/time-bucket", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/search/time-bucket",
+            json=dto.model_dump(mode="json", exclude_none=True),
+        )
+        data = resp.json()
+        return [TimeBucketsResponseDto.model_validate(item) for item in data]

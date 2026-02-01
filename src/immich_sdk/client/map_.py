@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.map_ import (
+    MapMarkerResponseDto,
+    MapReverseGeocodeResponseDto,
+)
 
 
 class MapClient:
@@ -24,7 +28,7 @@ class MapClient:
         is_favorite: bool | None = None,
         with_partners: bool | None = None,
         with_shared_albums: bool | None = None,
-    ) -> list[dict[str, object]]:
+    ) -> list[MapMarkerResponseDto]:
         """Retrieve latitude/longitude coordinates for every asset with location data.
 
         :param file_created_after: Optional filter: assets created after this date.
@@ -33,7 +37,7 @@ class MapClient:
         :param is_favorite: Optional filter for favorite assets.
         :param with_partners: Optional: include partner assets.
         :param with_shared_albums: Optional: include shared album assets.
-        :returns: List of marker dicts.
+        :returns: List of map marker DTOs.
         """
         params: dict[str, str | bool] = {}
         if file_created_after is not None:
@@ -49,16 +53,18 @@ class MapClient:
         if with_shared_albums is not None:
             params["withSharedAlbums"] = with_shared_albums
         resp = self._base.get("/api/map/markers", params=params or None)
-        return resp.json()
+        return [MapMarkerResponseDto.model_validate(m) for m in resp.json()]
 
-    def reverse_geocode(self, lat: float, lon: float) -> list[dict[str, object]]:
+    def reverse_geocode(
+        self, lat: float, lon: float
+    ) -> list[MapReverseGeocodeResponseDto]:
         """Retrieve location information for given latitude and longitude coordinates.
 
         :param lat: Latitude.
         :param lon: Longitude.
-        :returns: List of location dicts.
+        :returns: List of reverse geocode DTOs.
         """
         resp = self._base.get(
             "/api/map/reverse-geocode", params={"lat": lat, "lon": lon}
         )
-        return resp.json()
+        return [MapReverseGeocodeResponseDto.model_validate(r) for r in resp.json()]

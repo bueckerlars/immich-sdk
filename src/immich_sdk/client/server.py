@@ -3,6 +3,12 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models import (
+    ServerConfigDto,
+    ServerFeaturesDto,
+    ServerStatsResponseDto,
+    ServerVersionResponseDto,
+)
 
 
 class ServerClient:
@@ -15,34 +21,34 @@ class ServerClient:
         """
         self._base = base
 
-    def get_server_version(self) -> dict[str, object]:
+    def get_server_version(self) -> ServerVersionResponseDto:
         """Get server version.
 
-        :returns: Raw response dict from the API.
+        :returns: :class:`ServerVersionResponseDto`.
         """
         resp = self._base.get("/api/server/version")
-        return resp.json()
+        return ServerVersionResponseDto.model_validate(resp.json())
 
-    def get_server_features(self) -> dict[str, object]:
+    def get_server_features(self) -> ServerFeaturesDto:
         """Get server features.
 
-        :returns: Raw response dict from the API.
+        :returns: :class:`ServerFeaturesDto`.
         """
         resp = self._base.get("/api/server/features")
-        return resp.json()
+        return ServerFeaturesDto.model_validate(resp.json())
 
-    def get_server_config(self) -> dict[str, object]:
+    def get_server_config(self) -> ServerConfigDto:
         """Get server config.
 
-        :returns: Raw response dict from the API.
+        :returns: :class:`ServerConfigDto`.
         """
         resp = self._base.get("/api/server/config")
-        return resp.json()
+        return ServerConfigDto.model_validate(resp.json())
 
-    def get_server_statistics(self) -> dict[str, object]:
+    def get_server_statistics(self) -> ServerStatsResponseDto:
         """Get server statistics.
 
-        :returns: Raw response dict from the API.
+        :returns: :class:`ServerStatsResponseDto`.
         """
         resp = self._base.get("/api/server/statistics")
-        return resp.json()
+        return ServerStatsResponseDto.model_validate(resp.json())

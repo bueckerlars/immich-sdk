@@ -3,6 +3,12 @@
 from __future__ import annotations
 
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models.system_metadata import (
+    AdminOnboardingUpdateDto,
+    ReverseGeocodingStateResponseDto,
+    SystemMetadataResponseDto,
+    VersionCheckStateResponseDto,
+)
 
 
 class SystemMetadataClient:
@@ -15,10 +21,36 @@ class SystemMetadataClient:
         """
         self._base = base
 
-    def get_system_metadata(self) -> dict[str, object]:
-        """Get system metadata.
+    def get_system_metadata(self) -> SystemMetadataResponseDto:
+        """Get system metadata (combined or root response).
 
-        :returns: Raw response dict from the API.
+        :returns: System metadata response DTO.
         """
         resp = self._base.get("/api/system-metadata")
-        return resp.json()
+        return SystemMetadataResponseDto.model_validate(resp.json())
+
+    def get_admin_onboarding(self) -> AdminOnboardingUpdateDto:
+        """Retrieve the current admin onboarding status.
+
+        :returns: Admin onboarding status DTO.
+        """
+        resp = self._base.get("/api/system-metadata/admin-onboarding")
+        return AdminOnboardingUpdateDto.model_validate(resp.json())
+
+    def get_reverse_geocoding_state(
+        self,
+    ) -> ReverseGeocodingStateResponseDto:
+        """Retrieve the current state of the reverse geocoding import.
+
+        :returns: Reverse geocoding state DTO.
+        """
+        resp = self._base.get("/api/system-metadata/reverse-geocoding-state")
+        return ReverseGeocodingStateResponseDto.model_validate(resp.json())
+
+    def get_version_check_state(self) -> VersionCheckStateResponseDto:
+        """Retrieve the current state of the version check process.
+
+        :returns: Version check state DTO.
+        """
+        resp = self._base.get("/api/system-metadata/version-check-state")
+        return VersionCheckStateResponseDto.model_validate(resp.json())

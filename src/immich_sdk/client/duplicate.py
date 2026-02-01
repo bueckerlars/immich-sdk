@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from immich_sdk.models import BulkIdsDto
 from immich_sdk.client._base import BaseClient
+from immich_sdk.models import BulkIdsDto, DuplicateResponseDto
 
 
 class DuplicatesClient:
@@ -18,13 +18,14 @@ class DuplicatesClient:
         """
         self._base = base
 
-    def get_asset_duplicates(self) -> list[dict[str, object]]:
+    def get_asset_duplicates(self) -> list[DuplicateResponseDto]:
         """Retrieve a list of duplicate assets available to the authenticated user.
 
-        :returns: List of duplicate asset dicts.
+        :returns: List of :class:`DuplicateResponseDto`.
         """
         resp = self._base.get("/api/duplicates")
-        return resp.json()
+        data = resp.json()
+        return [DuplicateResponseDto.model_validate(item) for item in data]
 
     def delete_duplicates(self, dto: BulkIdsDto) -> None:
         """Delete multiple duplicate assets specified by their IDs.

@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
-from immich_sdk.models import (
+from immich_sdk.client._base import BaseClient
+from immich_sdk.models.auth import (
     AuthStatusResponseDto,
+    ChangePasswordDto,
     LoginCredentialDto,
     LoginResponseDto,
+    LogoutResponseDto,
+    ValidateAccessTokenResponseDto,
 )
-from immich_sdk.client._base import BaseClient
+from immich_sdk.models.user_admin import UserAdminResponseDto
 
 
 class AuthClient:
@@ -37,27 +41,30 @@ class AuthClient:
         resp = self._base.get("/api/auth/status")
         return AuthStatusResponseDto.model_validate(resp.json())
 
-    def logout(self) -> dict[str, object]:
+    def logout(self) -> LogoutResponseDto:
         """Logout the current user and invalidate the session token.
 
-        :returns: Raw response dict from the API.
+        :returns: Logout response.
         """
         resp = self._base.post("/api/auth/logout")
-        return resp.json()
+        return LogoutResponseDto.model_validate(resp.json())
 
-    def change_password(self, dto: dict[str, object]) -> dict[str, object]:
+    def change_password(self, dto: ChangePasswordDto) -> UserAdminResponseDto:
         """Change the password of the current user.
 
-        :param dto: Dict with old and new password.
-        :returns: Raw response dict from the API.
+        :param dto: Change password DTO.
+        :returns: Updated user (admin) response.
         """
-        resp = self._base.post("/api/auth/change-password", json=dto)
-        return resp.json()
+        resp = self._base.post(
+            "/api/auth/change-password",
+            json=dto.model_dump(by_alias=True, exclude_none=True),
+        )
+        return UserAdminResponseDto.model_validate(resp.json())
 
-    def validate_access_token(self) -> dict[str, object]:
+    def validate_access_token(self) -> ValidateAccessTokenResponseDto:
         """Validate the current authorization method is still valid.
 
-        :returns: Raw response dict from the API.
+        :returns: Validate token response.
         """
         resp = self._base.post("/api/auth/validateToken")
-        return resp.json()
+        return ValidateAccessTokenResponseDto.model_validate(resp.json())
